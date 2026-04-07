@@ -1,8 +1,8 @@
-// ============================================================
-// LISTA DE ASSESSORES
-// ============================================================
+// ===== CONFIGURAÇÃO =====
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyMezU0QgO_TFRI--YUdgyR7-jphvoqlcsNdNuZjasvBm6B5TgpMXVTC3RubJZGecah/exec";
+
 const ASSESSORES = [
-  "Adyr Nicchio Neto","Adriano Morandi Rondeli","Alecio Bernardino da Silva",
+   "Adyr Nicchio Neto","Adriano Morandi Rondeli","Alecio Bernardino da Silva",
   "Alessandra Reis Estanislau","Amanda Boaventura Xavier","Amanda Martins Soares",
   "Ana Carolina Gomes dos Santos","Andre Pereira da Motta","Andrea de Aguiar Dias Saraiva Gomes",
   "Arthur Massucatti Rondeli","Athos Fontenelle Fittipaldi","Bernardo Cascao Bougleux Couto",
@@ -58,299 +58,222 @@ const ASSESSORES = [
   "Willian de Angeli Prata","Yago Loureiro Comerio"
 ];
 
-// ============================================================
-// URL GOOGLE APPS SCRIPT
-// ============================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMezU0QgO_TFRI--YUdgyR7-jphvoqlcsNdNuZjasvBm6B5TgpMXVTC3RubJZGecah/exec";
+// ===== INIT =====
+document.addEventListener("DOMContentLoaded", () => {
+  const sel = document.getElementById("assessor");
+  ASSESSORES.forEach(nome => {
+    const opt = document.createElement("option");
+    opt.value = nome;
+    opt.textContent = nome;
+    sel.appendChild(opt);
+  });
 
-// ============================================================
-// ESTADO GLOBAL
-// ============================================================
-let dadosFormulario = {
-  assessor: "",
-  dataFp: "",
-  clienteNome: "",
-  clienteCodigo: "",
-  patrimonio: "",
-  faixa: "",
-  produtos: [],
-  status: "",
-  diasRetorno: "",
-  observacoes: ""
-};
+  const hoje = new Date().toISOString().split("T")[0];
+  document.getElementById("dataFp").value = hoje;
 
-// ============================================================
-// INICIALIZAÇÃO
-// ============================================================
-document.addEventListener("DOMContentLoaded", function () {
-  popularAssessores();
-  definirDataHoje();
+  observarProdutos();
 });
 
-function popularAssessores() {
-  var select = document.getElementById("assessor");
-  if (!select) {
-    console.error("ERRO: elemento #assessor não encontrado!");
-    return;
-  }
-  ASSESSORES.forEach(function (nome) {
-    var option = document.createElement("option");
-    option.value = nome;
-    option.textContent = nome;
-    select.appendChild(option);
-  });
-  console.log("Assessores carregados:", ASSESSORES.length);
-}
+// ===== NAVEGAÇÃO =====
+function irPara(step) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(`step-${step}`).classList.add("active");
 
-function definirDataHoje() {
-  var hoje = new Date().toISOString().split("T")[0];
-  var campo = document.getElementById("dataFp");
-  if (campo) campo.value = hoje;
-}
-
-// ============================================================
-// NAVEGAÇÃO
-// ============================================================
-function irPara(etapa) {
-  if (etapa === 2 && !validarEtapa1()) return;
-  if (etapa === 3 && !validarEtapa2()) return;
-  if (etapa === 4 && !validarEtapa3()) return;
-
-  coletarDados();
-
-  document.querySelectorAll(".screen").forEach(function (s) {
-    s.classList.remove("active");
-  });
-
-  var tela = document.getElementById("step-" + etapa);
-  if (tela) tela.classList.add("active");
-
-  var indicador = document.getElementById("step-indicator");
-  if (indicador) {
-    var label = etapa <= 4 ? ("Etapa " + etapa + " de 4") : "Concluído ✓";
-    indicador.textContent = label;
+  const total = 4;
+  const indicador = document.getElementById("step-indicator");
+  if (step < 5) {
+    indicador.textContent = `Etapa ${step} de ${total}`;
+  } else {
+    indicador.textContent = "Concluído ✓";
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ============================================================
-// VALIDAÇÕES
-// ============================================================
-function validarEtapa1() {
-  var assessor = document.getElementById("assessor").value;
-  var dataFp   = document.getElementById("dataFp").value;
-  if (!assessor) { alert("Selecione o assessor responsável."); return false; }
-  if (!dataFp)   { alert("Informe a data do FP."); return false; }
-  return true;
-}
-
-function validarEtapa2() {
-  var nome       = document.getElementById("clienteNome").value.trim();
-  var codigo     = document.getElementById("clienteCodigo").value.trim();
-  var patrimonio = document.getElementById("patrimonio").value;
-  var faixa      = document.getElementById("faixa").value;
-  if (!nome)       { alert("Informe o nome do cliente."); return false; }
-  if (!codigo)     { alert("Informe o código XP."); return false; }
-  if (!patrimonio) { alert("Informe o patrimônio aproximado."); return false; }
-  if (!faixa)      { alert("Selecione a faixa."); return false; }
-  return true;
-}
-
-function validarEtapa3() {
-  var selecionados = document.querySelectorAll(".produto-card.selecionado");
-  if (selecionados.length === 0) {
-    alert("Selecione pelo menos um produto com oportunidade.");
-    return false;
-  }
-  return true;
-}
-
-// ============================================================
-// COLETA DE DADOS
-// ============================================================
-function coletarDados() {
-  dadosFormulario.assessor      = document.getElementById("assessor").value;
-  dadosFormulario.dataFp        = document.getElementById("dataFp").value;
-  dadosFormulario.clienteNome   = document.getElementById("clienteNome").value.trim();
-  dadosFormulario.clienteCodigo = document.getElementById("clienteCodigo").value.trim();
-  dadosFormulario.patrimonio    = document.getElementById("patrimonio").value;
-  dadosFormulario.faixa         = document.getElementById("faixa").value;
-  dadosFormulario.observacoes   = document.getElementById("observacoes").value.trim();
-
-  dadosFormulario.produtos = [];
-  document.querySelectorAll(".produto-card.selecionado").forEach(function (card) {
-    var nome     = card.getAttribute("data-produto");
-    var textarea = card.querySelector("textarea");
-    var detalhe  = textarea ? textarea.value.trim() : "";
-    dadosFormulario.produtos.push({ nome: nome, detalhe: detalhe });
-  });
-}
-
-// ============================================================
-// PRODUTOS — TOGGLE
-// ============================================================
+// ===== STEP 3: PRODUTOS =====
 function toggleProduto(card) {
+  const jaSelected = card.classList.contains("selecionado");
   card.classList.toggle("selecionado");
-  var detalheInput = card.querySelector(".produto-detalhe-input");
-  if (detalheInput) {
-    detalheInput.style.display = card.classList.contains("selecionado") ? "block" : "none";
+
+  const detalhe = card.querySelector(".produto-detalhe-input");
+  if (detalhe) {
+    detalhe.style.display = jaSelected ? "none" : "block";
+  }
+
+  if (jaSelected) {
+    card.querySelectorAll("input[type='radio']").forEach(r => r.checked = false);
+    const ta = card.querySelector("textarea");
+    if (ta) ta.value = "";
+  }
+
+  atualizarSemInteresse();
+}
+
+function atualizarSemInteresse() {
+  const algumSelecionado = document.querySelectorAll(".produto-card.selecionado").length > 0;
+  const box = document.getElementById("sem-interesse-box");
+  box.style.display = algumSelecionado ? "none" : "flex";
+
+  if (algumSelecionado) {
+    document.getElementById("chk-sem-interesse").checked = false;
   }
 }
 
-// ============================================================
-// STATUS — SELEÇÃO
-// ============================================================
-function selecionarStatus(card) {
-  document.querySelectorAll(".status-card").forEach(function (c) {
-    c.classList.remove("selecionado");
+function observarProdutos() {
+  atualizarSemInteresse();
+}
+
+function avancarStep3() {
+  const selecionados = document.querySelectorAll(".produto-card.selecionado");
+  const semInteresse = document.getElementById("chk-sem-interesse").checked;
+
+  if (selecionados.length === 0 && !semInteresse) {
+    alert("Selecione ao menos um produto ou confirme que não houve interesse.");
+    return;
+  }
+
+  let faltaStatus = [];
+  selecionados.forEach(card => {
+    const nome = card.dataset.produto;
+    const radios = card.querySelectorAll("input[type='radio']");
+    const marcado = Array.from(radios).some(r => r.checked);
+    if (!marcado) faltaStatus.push(nome);
   });
-  card.classList.add("selecionado");
-  dadosFormulario.status = card.getAttribute("data-status");
 
-  var grupoRetorno = document.getElementById("grupo-retorno");
-  if (grupoRetorno) {
-    grupoRetorno.style.display = dadosFormulario.status === "Em análise" ? "block" : "none";
+  if (faltaStatus.length > 0) {
+    alert(`Selecione o status para: ${faltaStatus.join(", ")}`);
+    return;
   }
+
+  irPara(4);
 }
 
-// ============================================================
-// ENVIO
-// ============================================================
-function enviarFormulario() {
-  if (!dadosFormulario.status) {
+// ===== STEP 4: STATUS =====
+function selecionarStatus(card) {
+  document.querySelectorAll(".status-card").forEach(c => c.classList.remove("selecionado"));
+  card.classList.add("selecionado");
+
+  const status = card.dataset.status;
+  const grupoRetorno = document.getElementById("grupo-retorno");
+  grupoRetorno.style.display = (status !== "Sem oportunidade") ? "block" : "none";
+}
+
+// ===== COLETA DE DADOS =====
+function coletarDados() {
+  const assessor    = document.getElementById("assessor").value;
+  const dataFp      = document.getElementById("dataFp").value;
+  const clienteNome = document.getElementById("clienteNome").value;
+  const clienteCod  = document.getElementById("clienteCodigo").value;
+  const patrimonio  = document.getElementById("patrimonio").value;
+  const faixa       = document.getElementById("faixa").value;
+  const observacoes = document.getElementById("observacoes").value;
+  const diasRetorno = document.getElementById("diasRetorno").value;
+
+  const statusCard = document.querySelector(".status-card.selecionado");
+  const statusCliente = statusCard ? statusCard.dataset.status : "";
+
+  const produtos = [];
+  document.querySelectorAll(".produto-card.selecionado").forEach(card => {
+    const nome   = card.dataset.produto;
+    const radios = card.querySelectorAll("input[type='radio']");
+    const status = Array.from(radios).find(r => r.checked)?.value || "";
+    const obs    = card.querySelector("textarea")?.value || "";
+    produtos.push({ nome, status, obs });
+  });
+
+  const semInteresse = document.getElementById("chk-sem-interesse").checked;
+
+  return {
+    assessor,
+    dataFp,
+    clienteNome,
+    clienteCodigo: clienteCod,
+    patrimonio,
+    faixa,
+    statusCliente,
+    diasRetorno,
+    observacoes,
+    semInteresse,
+    produtos: JSON.stringify(produtos),
+    timestamp: new Date().toISOString()
+  };
+}
+
+// ===== ENVIO =====
+async function enviarFormulario() {
+  const statusCard = document.querySelector(".status-card.selecionado");
+  if (!statusCard) {
     alert("Selecione o status do cliente.");
     return;
   }
 
-  coletarDados();
-  dadosFormulario.diasRetorno = document.getElementById("diasRetorno").value;
+  const dados = coletarDados();
 
-  var overlay = document.getElementById("loading-overlay");
-  if (overlay) overlay.style.display = "flex";
+  const overlay = document.getElementById("loading-overlay");
+  overlay.classList.add("open");
 
-  var payload = {
-    assessor:      dadosFormulario.assessor,
-    dataFp:        dadosFormulario.dataFp,
-    clienteNome:   dadosFormulario.clienteNome,
-    clienteCodigo: dadosFormulario.clienteCodigo,
-    patrimonio:    dadosFormulario.patrimonio,
-    faixa:         dadosFormulario.faixa,
-    produtos:      dadosFormulario.produtos.map(function(p){ return p.nome; }).join(", "),
-    detalhes:      dadosFormulario.produtos.map(function(p){ return p.nome + ": " + p.detalhe; }).join(" | "),
-    status:        dadosFormulario.status,
-    diasRetorno:   dadosFormulario.diasRetorno,
-    observacoes:   dadosFormulario.observacoes
-  };
+  try {
+    const params = new URLSearchParams(dados);
+    await fetch(`${SHEET_URL}?${params}`, { method: "GET", mode: "no-cors" });
 
-  fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-  .then(function () {
-    if (overlay) overlay.style.display = "none";
-    exibirSucesso();
-  })
-  .catch(function () {
-    if (overlay) overlay.style.display = "none";
-    alert("Erro ao salvar. Verifique sua conexão e tente novamente.");
-  });
-}
-
-// ============================================================
-// SUCESSO
-// ============================================================
-function exibirSucesso() {
-  var produtos = dadosFormulario.produtos.map(function(p){ return "• " + p.nome; }).join("<br>");
-
-  var resumo = document.getElementById("resumo-box");
-  if (resumo) {
-    resumo.innerHTML =
-      "<p><strong>Assessor:</strong> " + dadosFormulario.assessor + "</p>" +
-      "<p><strong>Data:</strong> " + formatarData(dadosFormulario.dataFp) + "</p>" +
-      "<p><strong>Cliente:</strong> " + dadosFormulario.clienteNome + " (" + dadosFormulario.clienteCodigo + ")</p>" +
-      "<p><strong>Patrimônio:</strong> " + formatarMoeda(dadosFormulario.patrimonio) + "</p>" +
-      "<p><strong>Faixa:</strong> " + dadosFormulario.faixa + "</p>" +
-      "<p><strong>Produtos:</strong><br>" + produtos + "</p>" +
-      "<p><strong>Status:</strong> " + dadosFormulario.status + "</p>" +
-      (dadosFormulario.diasRetorno ? "<p><strong>Retorno em:</strong> " + dadosFormulario.diasRetorno + " dias</p>" : "") +
-      (dadosFormulario.observacoes ? "<p><strong>Obs:</strong> " + dadosFormulario.observacoes + "</p>" : "");
+    exibirResumo(dados);
+    irPara(5);
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao salvar. Tente novamente.");
+  } finally {
+    overlay.classList.remove("open");
   }
-
-  document.querySelectorAll(".screen").forEach(function (s) {
-    s.classList.remove("active");
-  });
-
-  var step5 = document.getElementById("step-5");
-  if (step5) step5.classList.add("active");
-
-  var indicador = document.getElementById("step-indicator");
-  if (indicador) indicador.textContent = "Concluído ✓";
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ============================================================
-// NOVO REGISTRO — RESET
-// ============================================================
-function novoRegistro() {
-  dadosFormulario = {
-    assessor: "", dataFp: "", clienteNome: "", clienteCodigo: "",
-    patrimonio: "", faixa: "", produtos: [], status: "", diasRetorno: "", observacoes: ""
-  };
+// ===== RESUMO (Step 5) =====
+function exibirResumo(dados) {
+  const produtos = JSON.parse(dados.produtos);
+  const listaProdutos = produtos.length > 0
+    ? produtos.map(p =>
+        `<span class="tag">${p.nome}</span> ${p.status}${p.obs ? ` — <em>${p.obs}</em>` : ""}`
+      ).join("<br>")
+    : "<em>Nenhum produto selecionado</em>";
 
-  document.getElementById("assessor").value      = "";
+  document.getElementById("resumo-box").innerHTML = `
+    <strong>📅 Data:</strong> ${formatarData(dados.dataFp)}<br>
+    <strong>👤 Assessor:</strong> ${dados.assessor}<br>
+    <strong>🏢 Cliente:</strong> ${dados.clienteNome} ${dados.clienteCodigo ? `(${dados.clienteCodigo})` : ""}<br>
+    <strong>💰 Patrimônio:</strong> ${dados.patrimonio ? `R$ ${Number(dados.patrimonio).toLocaleString("pt-BR")}` : "—"} · ${dados.faixa || "—"}<br>
+    <strong>📊 Status:</strong> ${dados.statusCliente || "—"}${dados.diasRetorno ? ` · Retorno em ${dados.diasRetorno} dias` : ""}<br>
+    <strong>💼 Cross Sell:</strong><br>${listaProdutos}<br>
+    ${dados.observacoes ? `<strong>📝 Obs:</strong> ${dados.observacoes}` : ""}
+  `;
+}
+
+function formatarData(dateStr) {
+  if (!dateStr) return "—";
+  const [y, m, d] = dateStr.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+// ===== NOVO REGISTRO =====
+function novoRegistro() {
+  document.querySelectorAll(".produto-card").forEach(card => {
+    card.classList.remove("selecionado");
+    const detalhe = card.querySelector(".produto-detalhe-input");
+    if (detalhe) detalhe.style.display = "none";
+    card.querySelectorAll("input[type='radio']").forEach(r => r.checked = false);
+    const ta = card.querySelector("textarea");
+    if (ta) ta.value = "";
+  });
+
+  document.querySelectorAll(".status-card").forEach(c => c.classList.remove("selecionado"));
+  document.getElementById("grupo-retorno").style.display = "none";
+
   document.getElementById("clienteNome").value   = "";
   document.getElementById("clienteCodigo").value = "";
   document.getElementById("patrimonio").value    = "";
   document.getElementById("faixa").value         = "";
   document.getElementById("observacoes").value   = "";
   document.getElementById("diasRetorno").value   = "";
+  document.getElementById("chk-sem-interesse").checked = false;
 
-  var grupoRetorno = document.getElementById("grupo-retorno");
-  if (grupoRetorno) grupoRetorno.style.display = "none";
-
-  definirDataHoje();
-
-  document.querySelectorAll(".produto-card").forEach(function (card) {
-    card.classList.remove("selecionado");
-    var detalheInput = card.querySelector(".produto-detalhe-input");
-    if (detalheInput) {
-      detalheInput.style.display = "none";
-      var ta = detalheInput.querySelector("textarea");
-      if (ta) ta.value = "";
-    }
-  });
-
-  document.querySelectorAll(".status-card").forEach(function (c) {
-    c.classList.remove("selecionado");
-  });
-
-  document.querySelectorAll(".screen").forEach(function (s) {
-    s.classList.remove("active");
-  });
-
-  var step1 = document.getElementById("step-1");
-  if (step1) step1.classList.add("active");
-
-  var indicador = document.getElementById("step-indicator");
-  if (indicador) indicador.textContent = "Etapa 1 de 4";
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-// ============================================================
-// UTILITÁRIOS
-// ============================================================
-function formatarData(dataISO) {
-  if (!dataISO) return "";
-  var partes = dataISO.split("-");
-  return partes[2] + "/" + partes[1] + "/" + partes[0];
-}
-
-function formatarMoeda(valor) {
-  if (!valor) return "";
-  return Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  atualizarSemInteresse();
+  irPara(1);
 }
