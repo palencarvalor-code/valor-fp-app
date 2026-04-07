@@ -162,7 +162,7 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .produto-card {
@@ -208,6 +208,7 @@ h2 {
   font-family: inherit;
   resize: vertical;
   background: white;
+  margin-top: 8px;
 }
 
 .produto-detalhe-input textarea:focus {
@@ -215,7 +216,86 @@ h2 {
   border-color: #2e7df7;
 }
 
-/* ===== STATUS OPTIONS ===== */
+/* ===== RADIO STATUS (dentro do card de produto) ===== */
+.status-radio {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.15s;
+}
+
+.radio-label input[type="radio"] {
+  accent-color: #2e7df7;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.radio-label.demanda {
+  background: #fff1f1;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.radio-label.demanda:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.radio-label.analise {
+  background: #fefce8;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.radio-label.analise:hover {
+  background: #fef9c3;
+  border-color: #fbbf24;
+}
+
+/* ===== SEM INTERESSE BOX ===== */
+.sem-interesse-box {
+  background: #fff7ed;
+  border: 1.5px solid #fed7aa;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.sem-interesse-box label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #92400e;
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.sem-interesse-box input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: #f97316;
+  cursor: pointer;
+}
+
+/* ===== STATUS OPTIONS (Step 4) ===== */
 .status-options {
   display: flex;
   flex-direction: column;
