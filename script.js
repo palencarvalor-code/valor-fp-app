@@ -166,6 +166,11 @@ const ASSESSORES = [
 ];
 
 // ============================================================
+// URL DO GOOGLE APPS SCRIPT
+// ============================================================
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMezU0QgO_TFRI--YUdgyR7-jphvoqlcsNdNuZjasvBm6B5TgpMXVTC3RubJZGecah/exec";
+
+// ============================================================
 // ESTADO GLOBAL
 // ============================================================
 let dadosFormulario = {
@@ -175,7 +180,7 @@ let dadosFormulario = {
   clienteCodigo: "",
   patrimonio: "",
   faixa: "",
-  produtos: [],        // [{ nome, detalhe }]
+  produtos: [],
   status: "",
   diasRetorno: "",
   observacoes: ""
@@ -208,19 +213,15 @@ function definirDataHoje() {
 // NAVEGAÇÃO ENTRE ETAPAS
 // ============================================================
 function irPara(etapa) {
-  // Valida antes de avançar
   if (etapa === 2 && !validarEtapa1()) return;
   if (etapa === 3 && !validarEtapa2()) return;
   if (etapa === 4 && !validarEtapa3()) return;
 
-  // Salva dados da etapa atual
   coletarDados();
 
-  // Troca a tela
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(`step-${etapa}`).classList.add("active");
 
-  // Atualiza indicador de etapa (step 5 = sucesso, não conta)
   const totalEtapas = 4;
   const etapaExibida = Math.min(etapa, totalEtapas);
   document.getElementById("step-indicator").textContent = `Etapa ${etapaExibida} de ${totalEtapas}`;
@@ -240,10 +241,10 @@ function validarEtapa1() {
 }
 
 function validarEtapa2() {
-  const nome      = document.getElementById("clienteNome").value.trim();
-  const codigo    = document.getElementById("clienteCodigo").value.trim();
+  const nome       = document.getElementById("clienteNome").value.trim();
+  const codigo     = document.getElementById("clienteCodigo").value.trim();
   const patrimonio = document.getElementById("patrimonio").value;
-  const faixa     = document.getElementById("faixa").value;
+  const faixa      = document.getElementById("faixa").value;
   if (!nome)       { alert("Informe o nome do cliente."); return false; }
   if (!codigo)     { alert("Informe o código XP."); return false; }
   if (!patrimonio) { alert("Informe o patrimônio aproximado."); return false; }
@@ -261,23 +262,22 @@ function validarEtapa3() {
 }
 
 // ============================================================
-// COLETA DE DADOS (chamado ao navegar)
+// COLETA DE DADOS
 // ============================================================
 function coletarDados() {
-  dadosFormulario.assessor     = document.getElementById("assessor").value;
-  dadosFormulario.dataFp       = document.getElementById("dataFp").value;
-  dadosFormulario.clienteNome  = document.getElementById("clienteNome").value.trim();
+  dadosFormulario.assessor      = document.getElementById("assessor").value;
+  dadosFormulario.dataFp        = document.getElementById("dataFp").value;
+  dadosFormulario.clienteNome   = document.getElementById("clienteNome").value.trim();
   dadosFormulario.clienteCodigo = document.getElementById("clienteCodigo").value.trim();
-  dadosFormulario.patrimonio   = document.getElementById("patrimonio").value;
-  dadosFormulario.faixa        = document.getElementById("faixa").value;
-  dadosFormulario.observacoes  = document.getElementById("observacoes").value.trim();
+  dadosFormulario.patrimonio    = document.getElementById("patrimonio").value;
+  dadosFormulario.faixa         = document.getElementById("faixa").value;
+  dadosFormulario.observacoes   = document.getElementById("observacoes").value.trim();
 
-  // Coleta produtos selecionados + detalhes
   dadosFormulario.produtos = [];
   document.querySelectorAll(".produto-card.selecionado").forEach(card => {
-    const nome    = card.getAttribute("data-produto");
+    const nome     = card.getAttribute("data-produto");
     const textarea = card.querySelector("textarea");
-    const detalhe = textarea ? textarea.value.trim() : "";
+    const detalhe  = textarea ? textarea.value.trim() : "";
     dadosFormulario.produtos.push({ nome, detalhe });
   });
 }
@@ -301,7 +301,6 @@ function selecionarStatus(card) {
   card.classList.add("selecionado");
   dadosFormulario.status = card.getAttribute("data-status");
 
-  // Mostra campo de retorno apenas para "Em análise"
   const grupoRetorno = document.getElementById("grupo-retorno");
   grupoRetorno.style.display = dadosFormulario.status === "Em análise" ? "block" : "none";
 }
@@ -310,20 +309,16 @@ function selecionarStatus(card) {
 // ENVIO DO FORMULÁRIO
 // ============================================================
 function enviarFormulario() {
-  // Valida status
   if (!dadosFormulario.status) {
     alert("Selecione o status do cliente.");
     return;
   }
 
-  // Coleta dados finais
   coletarDados();
   dadosFormulario.diasRetorno = document.getElementById("diasRetorno").value;
 
-  // Mostra loading
   document.getElementById("loading-overlay").style.display = "flex";
 
-  // Monta payload para o Google Apps Script
   const payload = {
     assessor:      dadosFormulario.assessor,
     dataFp:        dadosFormulario.dataFp,
@@ -337,9 +332,6 @@ function enviarFormulario() {
     diasRetorno:   dadosFormulario.diasRetorno,
     observacoes:   dadosFormulario.observacoes
   };
-
-  // ⚠️ Substitua pela URL do seu Google Apps Script
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
 
   fetch(APPS_SCRIPT_URL, {
     method: "POST",
@@ -372,4 +364,64 @@ function exibirSucesso() {
     <p><strong>Produtos:</strong><br>${produtos}</p>
     <p><strong>Status:</strong> ${dadosFormulario.status}</p>
     ${dadosFormulario.diasRetorno ? `<p><strong>Retorno em:</strong> ${dadosFormulario.diasRetorno} dias</p>` : ""}
-    ${dadosFormulario.observacoes ? `<p><strong>Obs:</strong>
+    ${dadosFormulario.observacoes ? `<p><strong>Obs:</strong> ${dadosFormulario.observacoes}</p>` : ""}
+  `;
+
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("step-5").classList.add("active");
+  document.getElementById("step-indicator").textContent = "Concluído ✓";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ============================================================
+// NOVO REGISTRO — RESET
+// ============================================================
+function novoRegistro() {
+  dadosFormulario = {
+    assessor: "", dataFp: "", clienteNome: "", clienteCodigo: "",
+    patrimonio: "", faixa: "", produtos: [], status: "", diasRetorno: "", observacoes: ""
+  };
+
+  document.getElementById("assessor").value      = "";
+  document.getElementById("clienteNome").value   = "";
+  document.getElementById("clienteCodigo").value = "";
+  document.getElementById("patrimonio").value    = "";
+  document.getElementById("faixa").value         = "";
+  document.getElementById("observacoes").value   = "";
+  document.getElementById("diasRetorno").value   = "";
+  document.getElementById("grupo-retorno").style.display = "none";
+  definirDataHoje();
+
+  document.querySelectorAll(".produto-card").forEach(card => {
+    card.classList.remove("selecionado");
+    const detalheInput = card.querySelector(".produto-detalhe-input");
+    if (detalheInput) {
+      detalheInput.style.display = "none";
+      const ta = detalheInput.querySelector("textarea");
+      if (ta) ta.value = "";
+    }
+  });
+
+  document.querySelectorAll(".status-card").forEach(c => c.classList.remove("selecionado"));
+
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("step-1").classList.add("active");
+  document.getElementById("step-indicator").textContent = "Etapa 1 de 4";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ============================================================
+// UTILITÁRIOS
+// ============================================================
+function formatarData(dataISO) {
+  if (!dataISO) return "";
+  const [ano, mes, dia] = dataISO.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
+function formatarMoeda(valor) {
+  if (!valor) return "";
+  return Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
