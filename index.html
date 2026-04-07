@@ -1,134 +1,265 @@
-<!-- STEP 3 — PRODUTOS -->
-<section class="screen" id="step-3">
-  <h2>Oportunidades de Cross Sell 💼</h2>
-  <p class="subtitle">Selecione os produtos com oportunidade identificada</p>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VALOR | FP Onboarding PJ2</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
 
-  <div class="produtos-grid" id="produtos-grid">
+  <div class="app-container">
+    <header>
+      <div class="logo">🔷 VALOR</div>
+      <div class="header-title">FP Onboarding — PJ2</div>
+      <div class="step-indicator" id="step-indicator">Etapa 1 de 4</div>
+    </header>
 
-    <div class="produto-card" data-produto="Crédito" onclick="toggleProduto(this)">
-      <div class="produto-icon">💳</div>
-      <div class="produto-nome">Crédito</div>
-      <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-        <div class="status-radio">
-          <label class="radio-label demanda">
-            <input type="radio" name="status-Crédito" value="Demanda Imediata"> 🔴 Demanda Imediata
-          </label>
-          <label class="radio-label analise">
-            <input type="radio" name="status-Crédito" value="Em Análise"> 🟡 Em Análise
-          </label>
-        </div>
-        <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+    <!-- STEP 1 — ASSESSOR -->
+    <section class="screen active" id="step-1">
+      <h2>Olá! Vamos registrar um FP 👋</h2>
+      <p class="subtitle">Selecione seu nome para começar</p>
+      <div class="form-group">
+        <label>Assessor responsável</label>
+        <select id="assessor">
+          <option value="">Selecione...</option>
+        </select>
       </div>
-    </div>
-
-    <div class="produto-card" data-produto="Câmbio" onclick="toggleProduto(this)">
-      <div class="produto-icon">💱</div>
-      <div class="produto-nome">Câmbio</div>
-      <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-        <div class="status-radio">
-          <label class="radio-label demanda">
-            <input type="radio" name="status-Câmbio" value="Demanda Imediata"> 🔴 Demanda Imediata
-          </label>
-          <label class="radio-label analise">
-            <input type="radio" name="status-Câmbio" value="Em Análise"> 🟡 Em Análise
-          </label>
-        </div>
-        <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+      <div class="form-group">
+        <label>Data do FP</label>
+        <input type="date" id="dataFp"/>
       </div>
-    </div>
+      <button class="btn-primary" onclick="irPara(2)">Próximo →</button>
+    </section>
 
-    <div class="produto-card" data-produto="Previdência" onclick="toggleProduto(this)">
-      <div class="produto-icon">🏦</div>
-      <div class="produto-nome">Previdência</div>
-      <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-        <div class="status-radio">
-          <label class="radio-label demanda">
-            <input type="radio" name="status-Previdência" value="Demanda Imediata"> 🔴 Demanda Imediata
-          </label>
-          <label class="radio-label analise">
-            <input type="radio" name="status-Previdência" value="Em Análise"> 🟡 Em Análise
-          </label>
-        </div>
-        <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+    <!-- STEP 2 — CLIENTE -->
+    <section class="screen" id="step-2">
+      <h2>Dados do Cliente 🏢</h2>
+      <p class="subtitle">Preencha as informações básicas do cliente</p>
+      <div class="form-group">
+        <label>Nome do cliente / empresa</label>
+        <input type="text" id="clienteNome" placeholder="Ex: Empresa ABC Ltda"/>
       </div>
-    </div>
-
-    <div class="produto-card" data-produto="Consórcio" onclick="toggleProduto(this)">
-      <div class="produto-icon">🤝</div>
-      <div class="produto-nome">Consórcio</div>
-      <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-        <div class="status-radio">
-          <label class="radio-label demanda">
-            <input type="radio" name="status-Consórcio" value="Demanda Imediata"> 🔴 Demanda Imediata
-          </label>
-          <label class="radio-label analise">
-            <input type="radio" name="status-Consórcio" value="Em Análise"> 🟡 Em Análise
-          </label>
-        </div>
-        <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+      <div class="form-group">
+        <label>Código XP</label>
+        <input type="text" id="clienteCodigo" placeholder="Ex: 12345678"/>
       </div>
-    </div>
-
-    <div class="produto-card" data-produto="Mercado de Capitais" onclick="toggleProduto(this)">
-      <div class="produto-icon">📈</div>
-      <div class="produto-nome">Mercado de Capitais</div>
-      <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-        <div class="status-radio">
-          <label class="radio-label demanda">
-            <input type="radio" name="status-Mercado de Capitais" value="Demanda Imediata"> 🔴 Demanda Imediata
-          </label>
-          <label class="radio-label analise">
-            <input type="radio" name="status-Mercado de Capitais" value="Em Análise"> 🟡 Em Análise
-          </label>
-        </div>
-        <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+      <div class="form-group">
+        <label>Patrimônio aproximado (R$)</label>
+        <input type="number" id="patrimonio" placeholder="Ex: 500000"/>
       </div>
-    </div>
-
-    <div class="produto-card" data-produto="Seguro PF" onclick="toggleProduto(this)">
-      <div class="produto-icon">🛡️</div>
-      <div class="produto-nome">Seguro PF</div>
-      <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-        <div class="status-radio">
-          <label class="radio-label demanda">
-            <input type="radio" name="status-Seguro PF" value="Demanda Imediata"> 🔴 Demanda Imediata
-          </label>
-          <label class="radio-label analise">
-            <input type="radio" name="status-Seguro PF" value="Em Análise"> 🟡 Em Análise
-          </label>
-        </div>
-        <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+      <div class="form-group">
+        <label>Faixa</label>
+        <select id="faixa">
+          <option value="">Selecione...</option>
+          <option>Acima de 300K</option>
+          <option>Abaixo de 300K</option>
+        </select>
       </div>
-    </div>
-
-    <div class="produto-card" data-produto="Seguro PJ" onclick="toggleProduto(this)">
-      <div class="produto-icon">🏢</div>
-      <div class="produto-nome">Seguro PJ</div>
-      <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-        <div class="status-radio">
-          <label class="radio-label demanda">
-            <input type="radio" name="status-Seguro PJ" value="Demanda Imediata"> 🔴 Demanda Imediata
-          </label>
-          <label class="radio-label analise">
-            <input type="radio" name="status-Seguro PJ" value="Em Análise"> 🟡 Em Análise
-          </label>
-        </div>
-        <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="irPara(1)">← Voltar</button>
+        <button class="btn-primary" onclick="irPara(3)">Próximo →</button>
       </div>
-    </div>
+    </section>
 
+    <!-- STEP 3 — PRODUTOS -->
+    <section class="screen" id="step-3">
+      <h2>Oportunidades de Cross Sell 💼</h2>
+      <p class="subtitle">Selecione os produtos com oportunidade identificada</p>
+
+      <div class="produtos-grid" id="produtos-grid">
+
+        <div class="produto-card" data-produto="Crédito" onclick="toggleProduto(this)">
+          <div class="produto-icon">💳</div>
+          <div class="produto-nome">Crédito</div>
+          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+            <div class="status-radio">
+              <label class="radio-label demanda">
+                <input type="radio" name="status-Crédito" value="Demanda Imediata"> 🔴 Demanda Imediata
+              </label>
+              <label class="radio-label analise">
+                <input type="radio" name="status-Crédito" value="Em Análise"> 🟡 Em Análise
+              </label>
+            </div>
+            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="produto-card" data-produto="Câmbio" onclick="toggleProduto(this)">
+          <div class="produto-icon">💱</div>
+          <div class="produto-nome">Câmbio</div>
+          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+            <div class="status-radio">
+              <label class="radio-label demanda">
+                <input type="radio" name="status-Câmbio" value="Demanda Imediata"> 🔴 Demanda Imediata
+              </label>
+              <label class="radio-label analise">
+                <input type="radio" name="status-Câmbio" value="Em Análise"> 🟡 Em Análise
+              </label>
+            </div>
+            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="produto-card" data-produto="Previdência" onclick="toggleProduto(this)">
+          <div class="produto-icon">🏦</div>
+          <div class="produto-nome">Previdência</div>
+          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+            <div class="status-radio">
+              <label class="radio-label demanda">
+                <input type="radio" name="status-Previdência" value="Demanda Imediata"> 🔴 Demanda Imediata
+              </label>
+              <label class="radio-label analise">
+                <input type="radio" name="status-Previdência" value="Em Análise"> 🟡 Em Análise
+              </label>
+            </div>
+            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="produto-card" data-produto="Consórcio" onclick="toggleProduto(this)">
+          <div class="produto-icon">🤝</div>
+          <div class="produto-nome">Consórcio</div>
+          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+            <div class="status-radio">
+              <label class="radio-label demanda">
+                <input type="radio" name="status-Consórcio" value="Demanda Imediata"> 🔴 Demanda Imediata
+              </label>
+              <label class="radio-label analise">
+                <input type="radio" name="status-Consórcio" value="Em Análise"> 🟡 Em Análise
+              </label>
+            </div>
+            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="produto-card" data-produto="Mercado de Capitais" onclick="toggleProduto(this)">
+          <div class="produto-icon">📈</div>
+          <div class="produto-nome">Mercado de Capitais</div>
+          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+            <div class="status-radio">
+              <label class="radio-label demanda">
+                <input type="radio" name="status-Mercado de Capitais" value="Demanda Imediata"> 🔴 Demanda Imediata
+              </label>
+              <label class="radio-label analise">
+                <input type="radio" name="status-Mercado de Capitais" value="Em Análise"> 🟡 Em Análise
+              </label>
+            </div>
+            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="produto-card" data-produto="Seguro PF" onclick="toggleProduto(this)">
+          <div class="produto-icon">🛡️</div>
+          <div class="produto-nome">Seguro PF</div>
+          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+            <div class="status-radio">
+              <label class="radio-label demanda">
+                <input type="radio" name="status-Seguro PF" value="Demanda Imediata"> 🔴 Demanda Imediata
+              </label>
+              <label class="radio-label analise">
+                <input type="radio" name="status-Seguro PF" value="Em Análise"> 🟡 Em Análise
+              </label>
+            </div>
+            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="produto-card" data-produto="Seguro PJ" onclick="toggleProduto(this)">
+          <div class="produto-icon">🏢</div>
+          <div class="produto-nome">Seguro PJ</div>
+          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+            <div class="status-radio">
+              <label class="radio-label demanda">
+                <input type="radio" name="status-Seguro PJ" value="Demanda Imediata"> 🔴 Demanda Imediata
+              </label>
+              <label class="radio-label analise">
+                <input type="radio" name="status-Seguro PJ" value="Em Análise"> 🟡 Em Análise
+              </label>
+            </div>
+            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CONFIRMAÇÃO SEM INTERESSE -->
+      <div class="sem-interesse-box" id="sem-interesse-box" style="display:none">
+        <label>
+          <input type="checkbox" id="chk-sem-interesse">
+          Confirmo que abordei oportunidades de cross sell e o cliente não demonstrou interesse no momento.
+        </label>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="irPara(2)">← Voltar</button>
+        <button class="btn-primary" onclick="avancarStep3()">Próximo →</button>
+      </div>
+    </section>
+
+    <!-- STEP 4 — STATUS -->
+    <section class="screen" id="step-4">
+      <h2>Status & Encaminhamento ✅</h2>
+      <p class="subtitle">Como ficou o resultado do FP?</p>
+
+      <div class="form-group">
+        <label>Status do cliente</label>
+        <div class="status-options">
+          <div class="status-card" data-status="Interesse imediato" onclick="selecionarStatus(this)">
+            <div class="status-icon">🟢</div>
+            <div class="status-label">Interesse imediato</div>
+          </div>
+          <div class="status-card" data-status="Em análise" onclick="selecionarStatus(this)">
+            <div class="status-icon">🟡</div>
+            <div class="status-label">Em análise</div>
+          </div>
+          <div class="status-card" data-status="Sem oportunidade" onclick="selecionarStatus(this)">
+            <div class="status-icon">🔴</div>
+            <div class="status-label">Sem oportunidade</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" id="grupo-retorno" style="display:none">
+        <label>Retornar em quantos dias?</label>
+        <select id="diasRetorno">
+          <option value="">Selecione...</option>
+          <option>7</option>
+          <option>15</option>
+          <option>30</option>
+          <option>60</option>
+          <option>90</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Observações (opcional)</label>
+        <textarea id="observacoes" rows="3" placeholder="Anotações importantes sobre o FP..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="irPara(3)">← Voltar</button>
+        <button class="btn-primary" onclick="enviarFormulario()">Enviar registro ✓</button>
+      </div>
+    </section>
+
+    <!-- STEP 5 — SUCESSO -->
+    <section class="screen" id="step-5">
+      <div class="sucesso-icon">🎉</div>
+      <h2>FP registrado com sucesso!</h2>
+      <p class="subtitle">Os dados foram salvos na planilha.</p>
+      <div class="resumo-box" id="resumo-box"></div>
+      <button class="btn-primary" onclick="novoRegistro()">+ Registrar novo FP</button>
+    </section>
+
+  </div><!-- /app-container -->
+
+  <!-- LOADING OVERLAY -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+    <span>Salvando registro...</span>
   </div>
 
-  <!-- CONFIRMAÇÃO SEM INTERESSE -->
-  <div class="sem-interesse-box" id="sem-interesse-box" style="display:none">
-    <label>
-      <input type="checkbox" id="chk-sem-interesse">
-      Confirmo que abordei oportunidades de cross sell e o cliente não demonstrou interesse no momento.
-    </label>
-  </div>
-
-  <div class="btn-row">
-    <button class="btn-secondary" onclick="irPara(2)">← Voltar</button>
-    <button class="btn-primary" onclick="avancarStep3()">Próximo →</button>
-  </div>
-</section>
+  <script src="script.js"></script>
+</body>
+</html>
