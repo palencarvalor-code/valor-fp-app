@@ -4,262 +4,613 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VALOR | FP Onboarding PJ2</title>
-  <link rel="stylesheet" href="style.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px 60px;
+    }
+
+    .app-container {
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      width: 100%;
+      max-width: 540px;
+      overflow: hidden;
+    }
+
+    header {
+      background: #0a2342;
+      color: white;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo { font-size: 18px; font-weight: 800; letter-spacing: 1px; }
+    .header-title { flex: 1; font-size: 14px; color: #a0b4c8; }
+    .step-indicator {
+      font-size: 12px;
+      background: rgba(255,255,255,0.12);
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: #e0eaf4;
+    }
+
+    .screen { display: none; padding: 28px 24px; animation: fadeIn 0.25s ease; }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 { font-size: 20px; font-weight: 700; color: #0a2342; margin-bottom: 6px; }
+    .subtitle { font-size: 14px; color: #6b7280; margin-bottom: 22px; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: #374151; margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid #d1d5db; border-radius: 10px;
+      font-size: 14px; color: #111827; background: #fafafa;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none; border-color: #2e7df7;
+      box-shadow: 0 0 0 3px rgba(46,125,247,0.12); background: white;
+    }
+
+    .form-group textarea { resize: vertical; }
+
+    .btn-primary {
+      width: 100%; padding: 13px; background: #2e7df7;
+      color: white; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: background 0.2s, transform 0.1s; margin-top: 6px;
+    }
+    .btn-primary:hover  { background: #1a6ae0; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-secondary {
+      flex: 1; padding: 13px; background: #f3f4f6;
+      color: #374151; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: #e5e7eb; }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 6px; }
+    .btn-row .btn-primary { margin-top: 0; }
+
+    .produtos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .produto-card {
+      border: 2px solid #e5e7eb; border-radius: 12px;
+      padding: 14px 12px; cursor: pointer;
+      transition: all 0.2s; text-align: center; background: #fafafa;
+    }
+    .produto-card:hover { border-color: #2e7df7; background: #eff6ff; }
+    .produto-card.selecionado {
+      border-color: #2e7df7; background: #eff6ff;
+      box-shadow: 0 0 0 3px rgba(46,125,247,0.15);
+    }
+
+    .produto-icon { font-size: 26px; margin-bottom: 6px; }
+    .produto-nome { font-size: 13px; font-weight: 600; color: #374151; }
+
+    .produto-detalhe-input { margin-top: 10px; text-align: left; }
+    .produto-detalhe-input textarea {
+      width: 100%; padding: 8px 10px;
+      border: 1.5px solid #d1d5db; border-radius: 8px;
+      font-size: 12px; font-family: inherit;
+      resize: vertical; background: white; margin-top: 8px;
+    }
+    .produto-detalhe-input textarea:focus {
+      outline: none; border-color: #2e7df7;
+    }
+
+    .status-radio { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+
+    .radio-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; padding: 6px 10px;
+      border-radius: 8px; cursor: pointer;
+      border: 1.5px solid transparent; transition: all 0.15s;
+    }
+    .radio-label input[type="radio"] {
+      accent-color: #2e7df7; width: 14px; height: 14px; flex-shrink: 0;
+    }
+    .radio-label.demanda { background: #fff1f1; color: #b91c1c; border-color: #fecaca; }
+    .radio-label.demanda:hover { background: #fee2e2; border-color: #f87171; }
+    .radio-label.analise { background: #fefce8; color: #92400e; border-color: #fde68a; }
+    .radio-label.analise:hover { background: #fef9c3; border-color: #fbbf24; }
+
+    .sem-interesse-box {
+      background: #fff7ed; border: 1.5px solid #fed7aa;
+      border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
+    }
+    .sem-interesse-box label {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: #92400e; font-weight: 500;
+      cursor: pointer; line-height: 1.5;
+    }
+    .sem-interesse-box input[type="checkbox"] {
+      width: 16px; height: 16px; flex-shrink: 0;
+      margin-top: 2px; accent-color: #f97316; cursor: pointer;
+    }
+
+    .status-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 6px; }
+    .status-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border: 2px solid #e5e7eb;
+      border-radius: 12px; cursor: pointer;
+      transition: all 0.2s; background: #fafafa;
+    }
+    .status-card:hover { border-color: #2e7df7; background: #eff6ff; }
+    .status-card.selecionado {
+      border-color: #2e7df7; background: #eff6ff;
+      box-shadow: 0 0 0 3px rgba(46,125,247,0.12);
+    }
+    .status-icon  { font-size: 20px; }
+    .status-label { font-size: 14px; font-weight: 600; color: #374151; }
+
+    .sucesso-icon { font-size: 56px; text-align: center; margin-bottom: 12px; }
+
+    .resumo-box {
+      background: #f8fafc; border: 1.5px solid #e5e7eb;
+      border-radius: 12px; padding: 16px;
+      margin: 18px 0 22px; font-size: 13px;
+      color: #374151; line-height: 1.8;
+    }
+
+    .tag {
+      display: inline-block; background: #dbeafe;
+      color: #1e40af; font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+    }
+
+    .loading-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(255,255,255,0.80); z-index: 300;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px;
+      font-size: 15px; color: #0a2342; font-weight: 600;
+    }
+    .loading-overlay.open { display: flex; }
+
+    .spinner {
+      width: 38px; height: 38px;
+      border: 4px solid #e5e7eb; border-top-color: #2e7df7;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 480px) {
+      body { padding: 0; align-items: flex-start; }
+      .app-container { border-radius: 0; min-height: 100vh; }
+      .produtos-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
 
-  <div class="app-container">
-    <header>
-      <div class="logo">🔷 VALOR</div>
-      <div class="header-title">FP Onboarding — PJ2</div>
-      <div class="step-indicator" id="step-indicator">Etapa 1 de 4</div>
-    </header>
+<div class="app-container">
+  <header>
+    <div class="logo">🔷 VALOR</div>
+    <div class="header-title">FP Onboarding — PJ2</div>
+    <div class="step-indicator" id="step-indicator">Etapa 1 de 4</div>
+  </header>
 
-    <!-- STEP 1 — ASSESSOR -->
-    <section class="screen active" id="step-1">
-      <h2>Olá! Vamos registrar um FP 👋</h2>
-      <p class="subtitle">Selecione seu nome para começar</p>
-      <div class="form-group">
-        <label>Assessor responsável</label>
-        <select id="assessor">
-          <option value="">Selecione...</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Data do FP</label>
-        <input type="date" id="dataFp"/>
-      </div>
-      <button class="btn-primary" onclick="irPara(2)">Próximo →</button>
-    </section>
+  <!-- STEP 1 -->
+  <section class="screen active" id="step-1">
+    <h2>Olá! Vamos registrar um FP 👋</h2>
+    <p class="subtitle">Selecione seu nome para começar</p>
+    <div class="form-group">
+      <label>Assessor responsável</label>
+      <select id="assessor"><option value="">Selecione...</option></select>
+    </div>
+    <div class="form-group">
+      <label>Data do FP</label>
+      <input type="date" id="dataFp"/>
+    </div>
+    <button class="btn-primary" onclick="irPara(2)">Próximo →</button>
+  </section>
 
-    <!-- STEP 2 — CLIENTE -->
-    <section class="screen" id="step-2">
-      <h2>Dados do Cliente 🏢</h2>
-      <p class="subtitle">Preencha as informações básicas do cliente</p>
-      <div class="form-group">
-        <label>Nome do cliente / empresa</label>
-        <input type="text" id="clienteNome" placeholder="Ex: Empresa ABC Ltda"/>
-      </div>
-      <div class="form-group">
-        <label>Código XP</label>
-        <input type="text" id="clienteCodigo" placeholder="Ex: 12345678"/>
-      </div>
-      <div class="form-group">
-        <label>Patrimônio aproximado (R$)</label>
-        <input type="number" id="patrimonio" placeholder="Ex: 500000"/>
-      </div>
-      <div class="form-group">
-        <label>Faixa</label>
-        <select id="faixa">
-          <option value="">Selecione...</option>
-          <option>Acima de 300K</option>
-          <option>Abaixo de 300K</option>
-        </select>
-      </div>
-      <div class="btn-row">
-        <button class="btn-secondary" onclick="irPara(1)">← Voltar</button>
-        <button class="btn-primary" onclick="irPara(3)">Próximo →</button>
-      </div>
-    </section>
+  <!-- STEP 2 -->
+  <section class="screen" id="step-2">
+    <h2>Dados do Cliente 🏢</h2>
+    <p class="subtitle">Preencha as informações básicas do cliente</p>
+    <div class="form-group">
+      <label>Nome do cliente / empresa</label>
+      <input type="text" id="clienteNome" placeholder="Ex: Empresa ABC Ltda"/>
+    </div>
+    <div class="form-group">
+      <label>Código XP</label>
+      <input type="text" id="clienteCodigo" placeholder="Ex: 12345678"/>
+    </div>
+    <div class="form-group">
+      <label>Patrimônio aproximado (R$)</label>
+      <input type="number" id="patrimonio" placeholder="Ex: 500000"/>
+    </div>
+    <div class="form-group">
+      <label>Faixa</label>
+      <select id="faixa">
+        <option value="">Selecione...</option>
+        <option>Acima de 300K</option>
+        <option>Abaixo de 300K</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="irPara(1)">← Voltar</button>
+      <button class="btn-primary" onclick="irPara(3)">Próximo →</button>
+    </div>
+  </section>
 
-    <!-- STEP 3 — PRODUTOS -->
-    <section class="screen" id="step-3">
-      <h2>Oportunidades de Cross Sell 💼</h2>
-      <p class="subtitle">Selecione os produtos com oportunidade identificada</p>
+  <!-- STEP 3 -->
+  <section class="screen" id="step-3">
+    <h2>Oportunidades de Cross Sell 💼</h2>
+    <p class="subtitle">Selecione os produtos com oportunidade identificada</p>
 
-      <div class="produtos-grid" id="produtos-grid">
+    <div class="produtos-grid" id="produtos-grid">
 
-        <div class="produto-card" data-produto="Crédito" onclick="toggleProduto(this)">
-          <div class="produto-icon">💳</div>
-          <div class="produto-nome">Crédito</div>
-          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-            <div class="status-radio">
-              <label class="radio-label demanda">
-                <input type="radio" name="status-Crédito" value="Demanda Imediata"> 🔴 Demanda Imediata
-              </label>
-              <label class="radio-label analise">
-                <input type="radio" name="status-Crédito" value="Em Análise"> 🟡 Em Análise
-              </label>
-            </div>
-            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+      <div class="produto-card" data-produto="Crédito" onclick="toggleProduto(this)">
+        <div class="produto-icon">💳</div>
+        <div class="produto-nome">Crédito</div>
+        <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+          <div class="status-radio">
+            <label class="radio-label demanda"><input type="radio" name="status-Credito" value="Demanda Imediata"> 🔴 Demanda Imediata</label>
+            <label class="radio-label analise"><input type="radio" name="status-Credito" value="Em Análise"> 🟡 Em Análise</label>
           </div>
-        </div>
-
-        <div class="produto-card" data-produto="Câmbio" onclick="toggleProduto(this)">
-          <div class="produto-icon">💱</div>
-          <div class="produto-nome">Câmbio</div>
-          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-            <div class="status-radio">
-              <label class="radio-label demanda">
-                <input type="radio" name="status-Câmbio" value="Demanda Imediata"> 🔴 Demanda Imediata
-              </label>
-              <label class="radio-label analise">
-                <input type="radio" name="status-Câmbio" value="Em Análise"> 🟡 Em Análise
-              </label>
-            </div>
-            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
-          </div>
-        </div>
-
-        <div class="produto-card" data-produto="Previdência" onclick="toggleProduto(this)">
-          <div class="produto-icon">🏦</div>
-          <div class="produto-nome">Previdência</div>
-          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-            <div class="status-radio">
-              <label class="radio-label demanda">
-                <input type="radio" name="status-Previdência" value="Demanda Imediata"> 🔴 Demanda Imediata
-              </label>
-              <label class="radio-label analise">
-                <input type="radio" name="status-Previdência" value="Em Análise"> 🟡 Em Análise
-              </label>
-            </div>
-            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
-          </div>
-        </div>
-
-        <div class="produto-card" data-produto="Consórcio" onclick="toggleProduto(this)">
-          <div class="produto-icon">🤝</div>
-          <div class="produto-nome">Consórcio</div>
-          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-            <div class="status-radio">
-              <label class="radio-label demanda">
-                <input type="radio" name="status-Consórcio" value="Demanda Imediata"> 🔴 Demanda Imediata
-              </label>
-              <label class="radio-label analise">
-                <input type="radio" name="status-Consórcio" value="Em Análise"> 🟡 Em Análise
-              </label>
-            </div>
-            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
-          </div>
-        </div>
-
-        <div class="produto-card" data-produto="Mercado de Capitais" onclick="toggleProduto(this)">
-          <div class="produto-icon">📈</div>
-          <div class="produto-nome">Mercado de Capitais</div>
-          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-            <div class="status-radio">
-              <label class="radio-label demanda">
-                <input type="radio" name="status-Mercado de Capitais" value="Demanda Imediata"> 🔴 Demanda Imediata
-              </label>
-              <label class="radio-label analise">
-                <input type="radio" name="status-Mercado de Capitais" value="Em Análise"> 🟡 Em Análise
-              </label>
-            </div>
-            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
-          </div>
-        </div>
-
-        <div class="produto-card" data-produto="Seguro PF" onclick="toggleProduto(this)">
-          <div class="produto-icon">🛡️</div>
-          <div class="produto-nome">Seguro PF</div>
-          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-            <div class="status-radio">
-              <label class="radio-label demanda">
-                <input type="radio" name="status-Seguro PF" value="Demanda Imediata"> 🔴 Demanda Imediata
-              </label>
-              <label class="radio-label analise">
-                <input type="radio" name="status-Seguro PF" value="Em Análise"> 🟡 Em Análise
-              </label>
-            </div>
-            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
-          </div>
-        </div>
-
-        <div class="produto-card" data-produto="Seguro PJ" onclick="toggleProduto(this)">
-          <div class="produto-icon">🏢</div>
-          <div class="produto-nome">Seguro PJ</div>
-          <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
-            <div class="status-radio">
-              <label class="radio-label demanda">
-                <input type="radio" name="status-Seguro PJ" value="Demanda Imediata"> 🔴 Demanda Imediata
-              </label>
-              <label class="radio-label analise">
-                <input type="radio" name="status-Seguro PJ" value="Em Análise"> 🟡 Em Análise
-              </label>
-            </div>
-            <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- CONFIRMAÇÃO SEM INTERESSE -->
-      <div class="sem-interesse-box" id="sem-interesse-box" style="display:none">
-        <label>
-          <input type="checkbox" id="chk-sem-interesse">
-          Confirmo que abordei oportunidades de cross sell e o cliente não demonstrou interesse no momento.
-        </label>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-secondary" onclick="irPara(2)">← Voltar</button>
-        <button class="btn-primary" onclick="avancarStep3()">Próximo →</button>
-      </div>
-    </section>
-
-    <!-- STEP 4 — STATUS -->
-    <section class="screen" id="step-4">
-      <h2>Status & Encaminhamento ✅</h2>
-      <p class="subtitle">Como ficou o resultado do FP?</p>
-
-      <div class="form-group">
-        <label>Status do cliente</label>
-        <div class="status-options">
-          <div class="status-card" data-status="Interesse imediato" onclick="selecionarStatus(this)">
-            <div class="status-icon">🟢</div>
-            <div class="status-label">Interesse imediato</div>
-          </div>
-          <div class="status-card" data-status="Em análise" onclick="selecionarStatus(this)">
-            <div class="status-icon">🟡</div>
-            <div class="status-label">Em análise</div>
-          </div>
-          <div class="status-card" data-status="Sem oportunidade" onclick="selecionarStatus(this)">
-            <div class="status-icon">🔴</div>
-            <div class="status-label">Sem oportunidade</div>
-          </div>
+          <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
         </div>
       </div>
 
-      <div class="form-group" id="grupo-retorno" style="display:none">
-        <label>Retornar em quantos dias?</label>
-        <select id="diasRetorno">
-          <option value="">Selecione...</option>
-          <option>7</option>
-          <option>15</option>
-          <option>30</option>
-          <option>60</option>
-          <option>90</option>
-        </select>
+      <div class="produto-card" data-produto="Câmbio" onclick="toggleProduto(this)">
+        <div class="produto-icon">💱</div>
+        <div class="produto-nome">Câmbio</div>
+        <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+          <div class="status-radio">
+            <label class="radio-label demanda"><input type="radio" name="status-Cambio" value="Demanda Imediata"> 🔴 Demanda Imediata</label>
+            <label class="radio-label analise"><input type="radio" name="status-Cambio" value="Em Análise"> 🟡 Em Análise</label>
+          </div>
+          <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Observações (opcional)</label>
-        <textarea id="observacoes" rows="3" placeholder="Anotações importantes sobre o FP..."></textarea>
+      <div class="produto-card" data-produto="Previdência" onclick="toggleProduto(this)">
+        <div class="produto-icon">🏦</div>
+        <div class="produto-nome">Previdência</div>
+        <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+          <div class="status-radio">
+            <label class="radio-label demanda"><input type="radio" name="status-Previdencia" value="Demanda Imediata"> 🔴 Demanda Imediata</label>
+            <label class="radio-label analise"><input type="radio" name="status-Previdencia" value="Em Análise"> 🟡 Em Análise</label>
+          </div>
+          <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+        </div>
       </div>
 
-      <div class="btn-row">
-        <button class="btn-secondary" onclick="irPara(3)">← Voltar</button>
-        <button class="btn-primary" onclick="enviarFormulario()">Enviar registro ✓</button>
+      <div class="produto-card" data-produto="Consórcio" onclick="toggleProduto(this)">
+        <div class="produto-icon">🤝</div>
+        <div class="produto-nome">Consórcio</div>
+        <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+          <div class="status-radio">
+            <label class="radio-label demanda"><input type="radio" name="status-Consorcio" value="Demanda Imediata"> 🔴 Demanda Imediata</label>
+            <label class="radio-label analise"><input type="radio" name="status-Consorcio" value="Em Análise"> 🟡 Em Análise</label>
+          </div>
+          <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+        </div>
       </div>
-    </section>
 
-    <!-- STEP 5 — SUCESSO -->
-    <section class="screen" id="step-5">
-      <div class="sucesso-icon">🎉</div>
-      <h2>FP registrado com sucesso!</h2>
-      <p class="subtitle">Os dados foram salvos na planilha.</p>
-      <div class="resumo-box" id="resumo-box"></div>
-      <button class="btn-primary" onclick="novoRegistro()">+ Registrar novo FP</button>
-    </section>
+      <div class="produto-card" data-produto="Mercado de Capitais" onclick="toggleProduto(this)">
+        <div class="produto-icon">📈</div>
+        <div class="produto-nome">Mercado de Capitais</div>
+        <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+          <div class="status-radio">
+            <label class="radio-label demanda"><input type="radio" name="status-MercadoCapitais" value="Demanda Imediata"> 🔴 Demanda Imediata</label>
+            <label class="radio-label analise"><input type="radio" name="status-MercadoCapitais" value="Em Análise"> 🟡 Em Análise</label>
+          </div>
+          <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+        </div>
+      </div>
 
-  </div><!-- /app-container -->
+      <div class="produto-card" data-produto="Seguro PF" onclick="toggleProduto(this)">
+        <div class="produto-icon">🛡️</div>
+        <div class="produto-nome">Seguro PF</div>
+        <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+          <div class="status-radio">
+            <label class="radio-label demanda"><input type="radio" name="status-SeguroPF" value="Demanda Imediata"> 🔴 Demanda Imediata</label>
+            <label class="radio-label analise"><input type="radio" name="status-SeguroPF" value="Em Análise"> 🟡 Em Análise</label>
+          </div>
+          <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+        </div>
+      </div>
 
-  <!-- LOADING OVERLAY -->
-  <div class="loading-overlay" id="loading-overlay">
-    <div class="spinner"></div>
-    <span>Salvando registro...</span>
-  </div>
+      <div class="produto-card" data-produto="Seguro PJ" onclick="toggleProduto(this)">
+        <div class="produto-icon">🏢</div>
+        <div class="produto-nome">Seguro PJ</div>
+        <div class="produto-detalhe-input" style="display:none" onclick="event.stopPropagation()">
+          <div class="status-radio">
+            <label class="radio-label demanda"><input type="radio" name="status-SeguroPJ" value="Demanda Imediata"> 🔴 Demanda Imediata</label>
+            <label class="radio-label analise"><input type="radio" name="status-SeguroPJ" value="Em Análise"> 🟡 Em Análise</label>
+          </div>
+          <textarea placeholder="Observação (opcional)..." rows="2"></textarea>
+        </div>
+      </div>
 
-  <script src="script.js"></script>
+    </div>
+
+    <div class="sem-interesse-box" id="sem-interesse-box" style="display:none">
+      <label>
+        <input type="checkbox" id="chk-sem-interesse">
+        Confirmo que abordei oportunidades de cross sell e o cliente não demonstrou interesse no momento.
+      </label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="irPara(2)">← Voltar</button>
+      <button class="btn-primary" onclick="avancarStep3()">Próximo →</button>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="screen" id="step-4">
+    <h2>Status & Encaminhamento ✅</h2>
+    <p class="subtitle">Como ficou o resultado do FP?</p>
+    <div class="form-group">
+      <label>Status do cliente</label>
+      <div class="status-options">
+        <div class="status-card" data-status="Interesse imediato" onclick="selecionarStatus(this)">
+          <div class="status-icon">🟢</div>
+          <div class="status-label">Interesse imediato</div>
+        </div>
+        <div class="status-card" data-status="Em análise" onclick="selecionarStatus(this)">
+          <div class="status-icon">🟡</div>
+          <div class="status-label">Em análise</div>
+        </div>
+        <div class="status-card" data-status="Sem oportunidade" onclick="selecionarStatus(this)">
+          <div class="status-icon">🔴</div>
+          <div class="status-label">Sem oportunidade</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group" id="grupo-retorno" style="display:none">
+      <label>Retornar em quantos dias?</label>
+      <select id="diasRetorno">
+        <option value="">Selecione...</option>
+        <option>7</option>
+        <option>15</option>
+        <option>30</option>
+        <option>60</option>
+        <option>90</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Observações (opcional)</label>
+      <textarea id="observacoes" rows="3" placeholder="Anotações importantes sobre o FP..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="irPara(3)">← Voltar</button>
+      <button class="btn-primary" onclick="enviarFormulario()">Enviar registro ✓</button>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="screen" id="step-5">
+    <div class="sucesso-icon">🎉</div>
+    <h2>FP registrado com sucesso!</h2>
+    <p class="subtitle">Os dados foram salvos na planilha.</p>
+    <div class="resumo-box" id="resumo-box"></div>
+    <button class="btn-primary" onclick="novoRegistro()">+ Registrar novo FP</button>
+  </section>
+
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <span>Salvando registro...</span>
+</div>
+
+<script>
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbyMezU0QgO_TFRI--YUdgyR7-jphvoqlcsNdNuZjasvBm6B5TgpMXVTC3RubJZGecah/exec";
+
+  const ASSESSORES = [
+    "Ana Lima",
+    "Bruno Carvalho",
+    "Carlos Meireles",
+    "Diana Souza",
+    "Eduardo Rocha"
+  ];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const sel = document.getElementById("assessor");
+    ASSESSORES.forEach(nome => {
+      const opt = document.createElement("option");
+      opt.value = nome;
+      opt.textContent = nome;
+      sel.appendChild(opt);
+    });
+
+    const hoje = new Date().toISOString().split("T")[0];
+    document.getElementById("dataFp").value = hoje;
+
+    atualizarSemInteresse();
+  });
+
+  function irPara(step) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(`step-${step}`).classList.add("active");
+    const indicador = document.getElementById("step-indicator");
+    indicador.textContent = step < 5 ? `Etapa ${step} de 4` : "Concluído ✓";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function toggleProduto(card) {
+    const jaSelected = card.classList.contains("selecionado");
+    card.classList.toggle("selecionado");
+    const detalhe = card.querySelector(".produto-detalhe-input");
+    if (detalhe) detalhe.style.display = jaSelected ? "none" : "block";
+    if (jaSelected) {
+      card.querySelectorAll("input[type='radio']").forEach(r => r.checked = false);
+      const ta = card.querySelector("textarea");
+      if (ta) ta.value = "";
+    }
+    atualizarSemInteresse();
+  }
+
+  function atualizarSemInteresse() {
+    const algum = document.querySelectorAll(".produto-card.selecionado").length > 0;
+    const box = document.getElementById("sem-interesse-box");
+    box.style.display = algum ? "none" : "flex";
+    if (algum) document.getElementById("chk-sem-interesse").checked = false;
+  }
+
+  function avancarStep3() {
+    const selecionados = document.querySelectorAll(".produto-card.selecionado");
+    const semInteresse = document.getElementById("chk-sem-interesse").checked;
+    if (selecionados.length === 0 && !semInteresse) {
+      alert("Selecione ao menos um produto ou confirme que não houve interesse.");
+      return;
+    }
+    const faltaStatus = [];
+    selecionados.forEach(card => {
+      const marcado = Array.from(card.querySelectorAll("input[type='radio']")).some(r => r.checked);
+      if (!marcado) faltaStatus.push(card.dataset.produto);
+    });
+    if (faltaStatus.length > 0) {
+      alert(`Selecione o status para: ${faltaStatus.join(", ")}`);
+      return;
+    }
+    irPara(4);
+  }
+
+  function selecionarStatus(card) {
+    document.querySelectorAll(".status-card").forEach(c => c.classList.remove("selecionado"));
+    card.classList.add("selecionado");
+    const status = card.dataset.status;
+    document.getElementById("grupo-retorno").style.display =
+      status !== "Sem oportunidade" ? "block" : "none";
+  }
+
+  function coletarDados() {
+    const produtos = [];
+    document.querySelectorAll(".produto-card.selecionado").forEach(card => {
+      const nome   = card.dataset.produto;
+      const status = Array.from(card.querySelectorAll("input[type='radio']")).find(r => r.checked)?.value || "";
+      const obs    = card.querySelector("textarea")?.value || "";
+      produtos.push({ nome, status, obs });
+    });
+
+    const statusCard = document.querySelector(".status-card.selecionado");
+
+    return {
+      assessor:      document.getElementById("assessor").value,
+      dataFp:        document.getElementById("dataFp").value,
+      clienteNome:   document.getElementById("clienteNome").value,
+      clienteCodigo: document.getElementById("clienteCodigo").value,
+      patrimonio:    document.getElementById("patrimonio").value,
+      faixa:         document.getElementById("faixa").value,
+      statusCliente: statusCard ? statusCard.dataset.status : "",
+      diasRetorno:   document.getElementById("diasRetorno").value,
+      observacoes:   document.getElementById("observacoes").value,
+      semInteresse:  document.getElementById("chk-sem-interesse").checked,
+      produtos:      JSON.stringify(produtos),
+      timestamp:     new Date().toISOString()
+    };
+  }
+
+  async function enviarFormulario() {
+    if (!document.querySelector(".status-card.selecionado")) {
+      alert("Selecione o status do cliente.");
+      return;
+    }
+    const dados = coletarDados();
+    const overlay = document.getElementById("loading-overlay");
+    overlay.classList.add("open");
+    try {
+      const params = new URLSearchParams(dados);
+      await fetch(`${SHEET_URL}?${params}`, { method: "GET", mode: "no-cors" });
+      exibirResumo(dados);
+      irPara(5);
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao salvar. Tente novamente.");
+    } finally {
+      overlay.classList.remove("open");
+    }
+  }
+
+  function exibirResumo(dados) {
+    const produtos = JSON.parse(dados.produtos);
+    const listaProdutos = produtos.length > 0
+      ? produtos.map(p =>
+          `<span class="tag">${p.nome}</span> ${p.status}${p.obs ? ` — <em>${p.obs}</em>` : ""}`
+        ).join("<br>")
+      : "<em>Nenhum produto selecionado</em>";
+
+    document.getElementById("resumo-box").innerHTML = `
+      <strong>📅 Data:</strong> ${formatarData(dados.dataFp)}<br>
+      <strong>👤 Assessor:</strong> ${dados.assessor}<br>
+      <strong>🏢 Cliente:</strong> ${dados.clienteNome} ${dados.clienteCodigo ? `(${dados.clienteCodigo})` : ""}<br>
+      <strong>💰 Patrimônio:</strong> ${dados.patrimonio ? `R$ ${Number(dados.patrimonio).toLocaleString("pt-BR")}` : "—"} · ${dados.faixa || "—"}<br>
+      <strong>📊 Status:</strong> ${dados.statusCliente || "—"}${dados.diasRetorno ? ` · Retorno em ${dados.diasRetorno} dias` : ""}<br>
+      <strong>💼 Cross Sell:</strong><br>${listaProdutos}<br>
+      ${dados.observacoes ? `<strong>📝 Obs:</strong> ${dados.observacoes}` : ""}
+    `;
+  }
+
+  function formatarData(dateStr) {
+    if (!dateStr) return "—";
+    const [y, m, d] = dateStr.split("-");
+    return `${d}/${m}/${y}`;
+  }
+
+  function novoRegistro() {
+    document.querySelectorAll(".produto-card").forEach(card => {
+      card.classList.remove("selecionado");
+      const detalhe = card.querySelector(".produto-detalhe-input");
+      if (detalhe) detalhe.style.display = "none";
+      card.querySelectorAll("input[type='radio']").forEach(r => r.checked = false);
+      const ta = card.querySelector("textarea");
+      if (ta) ta.value = "";
+    });
+    document.querySelectorAll(".status-card").forEach(c => c.classList.remove("selecionado"));
+    document.getElementById("grupo-retorno").style.display = "none";
+    document.getElementById("clienteNome").value   = "";
+    document.getElementById("clienteCodigo").value = "";
+    document.getElementById("patrimonio").value    = "";
+    document.getElementById("faixa").value         = "";
+    document.getElementById("observacoes").value   = "";
+    document.getElementById("diasRetorno").value   = "";
+    document.getElementById("chk-sem-interesse").checked = false;
+    atualizarSemInteresse();
+    irPara(1);
+  }
+</script>
+
 </body>
 </html>
