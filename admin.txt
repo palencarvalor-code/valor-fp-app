@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VALOR | Admin — PJ2</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="admin.css"/>
+</head>
+<body>
+
+  <!-- ===== LOGIN ===== -->
+  <div class="app-container" id="login-container">
+    <header>
+      <div class="logo">🔷 VALOR</div>
+      <div class="header-title">Painel Administrativo — PJ2</div>
+      <div class="step-indicator"></div>
+    </header>
+    <section class="screen active" id="login-screen">
+      <div class="login-icon">🔐</div>
+      <h2>Acesso Restrito</h2>
+      <p class="subtitle">Digite a senha para acessar o painel</p>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="senha-input" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') fazerLogin()"/>
+      </div>
+      <div id="login-erro" class="login-erro" style="display:none">
+        ❌ Senha incorreta. Tente novamente.
+      </div>
+      <button class="btn-primary" onclick="fazerLogin()">Entrar →</button>
+    </section>
+  </div>
+
+  <!-- ===== ADMIN PANEL ===== -->
+  <div id="admin-panel" style="display:none">
+
+    <div class="admin-topbar">
+      <div class="admin-logo">🔷 VALOR <span>| Admin PJ2</span></div>
+      <div class="admin-topbar-right">
+        <span id="ultimo-update" class="update-info"></span>
+        <button class="btn-refresh" onclick="carregarDados()">🔄 Atualizar</button>
+        <button class="btn-logout" onclick="logout()">Sair</button>
+      </div>
+    </div>
+
+    <div class="admin-body">
+
+      <!-- MÉTRICAS -->
+      <section class="admin-section">
+        <h3 class="section-title">📊 Painel de Métricas</h3>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon">📋</div>
+            <div class="metric-value" id="m-total">—</div>
+            <div class="metric-label">FPs Registrados</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">🟢</div>
+            <div class="metric-value" id="m-interesse">—</div>
+            <div class="metric-label">Interesse Imediato</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">🟡</div>
+            <div class="metric-value" id="m-analise">—</div>
+            <div class="metric-label">Em Análise</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">⚠️</div>
+            <div class="metric-value" id="m-vencidos">—</div>
+            <div class="metric-label">Follow-ups Vencidos</div>
+          </div>
+        </div>
+        <h4 class="sub-title">Oportunidades por Produto</h4>
+        <div class="bar-chart" id="bar-chart"></div>
+      </section>
+
+      <!-- ALERTAS -->
+      <section class="admin-section">
+        <h3 class="section-title">🔴 Alertas de Follow-up</h3>
+        <div id="alertas-container"></div>
+      </section>
+
+      <!-- FEED -->
+      <section class="admin-section">
+        <div class="feed-header">
+          <h3 class="section-title" style="margin-bottom:0">📋 Feed de Registros</h3>
+          <button class="btn-export" onclick="exportarCSV()">📤 Exportar CSV</button>
+        </div>
+
+        <div class="filtros-grid">
+          <div class="form-group">
+            <label>Assessor</label>
+            <select id="filtro-assessor" onchange="aplicarFiltros()">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Produto</label>
+            <select id="filtro-produto" onchange="aplicarFiltros()">
+              <option value="">Todos</option>
+              <option>Crédito</option>
+              <option>Câmbio</option>
+              <option>Previdência</option>
+              <option>Consórcio</option>
+              <option>Mercado de Capitais</option>
+              <option>Seguro PF</option>
+              <option>Seguro PJ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="filtro-status" onchange="aplicarFiltros()">
+              <option value="">Todos</option>
+              <option>Interesse imediato</option>
+              <option>Em análise</option>
+              <option>Sem oportunidade</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Faixa</label>
+            <select id="filtro-faixa" onchange="aplicarFiltros()">
+              <option value="">Todas</option>
+              <option>Acima de 300K</option>
+              <option>Abaixo de 300K</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data início</label>
+            <input type="date" id="filtro-data-ini" onchange="aplicarFiltros()"/>
+          </div>
+          <div class="form-group">
+            <label>Data fim</label>
+            <input type="date" id="filtro-data-fim" onchange="aplicarFiltros()"/>
+          </div>
+        </div>
+
+        <div class="filtros-actions">
+          <span id="filtro-count" class="filtro-count"></span>
+          <button class="btn-limpar" onclick="limparFiltros()">✕ Limpar filtros</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="feed-table" id="feed-table">
+            <thead>
+              <tr>
+                <th onclick="sortTable('dataFp')">Data FP ↕</th>
+                <th onclick="sortTable('assessor')">Assessor ↕</th>
+                <th>Cliente</th>
+                <th>Faixa</th>
+                <th>Produtos</th>
+                <th onclick="sortTable('status')">Status ↕</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="feed-body"></tbody>
+          </table>
+        </div>
+
+        <div id="feed-empty" class="feed-empty" style="display:none">
+          Nenhum registro encontrado para os filtros selecionados.
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal-overlay" onclick="fecharModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="fecharModal()">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
+    
