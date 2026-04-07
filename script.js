@@ -164,3 +164,212 @@ const ASSESSORES = [
   "Willian de Angeli Prata",
   "Yago Loureiro Comerio"
 ];
+
+// ============================================================
+// ESTADO GLOBAL
+// ============================================================
+let dadosFormulario = {
+  assessor: "",
+  dataFp: "",
+  clienteNome: "",
+  clienteCodigo: "",
+  patrimonio: "",
+  faixa: "",
+  produtos: [],        // [{ nome, detalhe }]
+  status: "",
+  diasRetorno: "",
+  observacoes: ""
+};
+
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+window.addEventListener("DOMContentLoaded", () => {
+  popularAssessores();
+  definirDataHoje();
+});
+
+function popularAssessores() {
+  const select = document.getElementById("assessor");
+  ASSESSORES.forEach(nome => {
+    const option = document.createElement("option");
+    option.value = nome;
+    option.textContent = nome;
+    select.appendChild(option);
+  });
+}
+
+function definirDataHoje() {
+  const hoje = new Date().toISOString().split("T")[0];
+  document.getElementById("dataFp").value = hoje;
+}
+
+// ============================================================
+// NAVEGAÇÃO ENTRE ETAPAS
+// ============================================================
+function irPara(etapa) {
+  // Valida antes de avançar
+  if (etapa === 2 && !validarEtapa1()) return;
+  if (etapa === 3 && !validarEtapa2()) return;
+  if (etapa === 4 && !validarEtapa3()) return;
+
+  // Salva dados da etapa atual
+  coletarDados();
+
+  // Troca a tela
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(`step-${etapa}`).classList.add("active");
+
+  // Atualiza indicador de etapa (step 5 = sucesso, não conta)
+  const totalEtapas = 4;
+  const etapaExibida = Math.min(etapa, totalEtapas);
+  document.getElementById("step-indicator").textContent = `Etapa ${etapaExibida} de ${totalEtapas}`;
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ============================================================
+// VALIDAÇÕES
+// ============================================================
+function validarEtapa1() {
+  const assessor = document.getElementById("assessor").value;
+  const dataFp   = document.getElementById("dataFp").value;
+  if (!assessor) { alert("Selecione o assessor responsável."); return false; }
+  if (!dataFp)   { alert("Informe a data do FP."); return false; }
+  return true;
+}
+
+function validarEtapa2() {
+  const nome      = document.getElementById("clienteNome").value.trim();
+  const codigo    = document.getElementById("clienteCodigo").value.trim();
+  const patrimonio = document.getElementById("patrimonio").value;
+  const faixa     = document.getElementById("faixa").value;
+  if (!nome)       { alert("Informe o nome do cliente."); return false; }
+  if (!codigo)     { alert("Informe o código XP."); return false; }
+  if (!patrimonio) { alert("Informe o patrimônio aproximado."); return false; }
+  if (!faixa)      { alert("Selecione a faixa."); return false; }
+  return true;
+}
+
+function validarEtapa3() {
+  const selecionados = document.querySelectorAll(".produto-card.selecionado");
+  if (selecionados.length === 0) {
+    alert("Selecione pelo menos um produto com oportunidade.");
+    return false;
+  }
+  return true;
+}
+
+// ============================================================
+// COLETA DE DADOS (chamado ao navegar)
+// ============================================================
+function coletarDados() {
+  dadosFormulario.assessor     = document.getElementById("assessor").value;
+  dadosFormulario.dataFp       = document.getElementById("dataFp").value;
+  dadosFormulario.clienteNome  = document.getElementById("clienteNome").value.trim();
+  dadosFormulario.clienteCodigo = document.getElementById("clienteCodigo").value.trim();
+  dadosFormulario.patrimonio   = document.getElementById("patrimonio").value;
+  dadosFormulario.faixa        = document.getElementById("faixa").value;
+  dadosFormulario.observacoes  = document.getElementById("observacoes").value.trim();
+
+  // Coleta produtos selecionados + detalhes
+  dadosFormulario.produtos = [];
+  document.querySelectorAll(".produto-card.selecionado").forEach(card => {
+    const nome    = card.getAttribute("data-produto");
+    const textarea = card.querySelector("textarea");
+    const detalhe = textarea ? textarea.value.trim() : "";
+    dadosFormulario.produtos.push({ nome, detalhe });
+  });
+}
+
+// ============================================================
+// PRODUTOS — TOGGLE
+// ============================================================
+function toggleProduto(card) {
+  card.classList.toggle("selecionado");
+  const detalheInput = card.querySelector(".produto-detalhe-input");
+  if (detalheInput) {
+    detalheInput.style.display = card.classList.contains("selecionado") ? "block" : "none";
+  }
+}
+
+// ============================================================
+// STATUS — SELEÇÃO
+// ============================================================
+function selecionarStatus(card) {
+  document.querySelectorAll(".status-card").forEach(c => c.classList.remove("selecionado"));
+  card.classList.add("selecionado");
+  dadosFormulario.status = card.getAttribute("data-status");
+
+  // Mostra campo de retorno apenas para "Em análise"
+  const grupoRetorno = document.getElementById("grupo-retorno");
+  grupoRetorno.style.display = dadosFormulario.status === "Em análise" ? "block" : "none";
+}
+
+// ============================================================
+// ENVIO DO FORMULÁRIO
+// ============================================================
+function enviarFormulario() {
+  // Valida status
+  if (!dadosFormulario.status) {
+    alert("Selecione o status do cliente.");
+    return;
+  }
+
+  // Coleta dados finais
+  coletarDados();
+  dadosFormulario.diasRetorno = document.getElementById("diasRetorno").value;
+
+  // Mostra loading
+  document.getElementById("loading-overlay").style.display = "flex";
+
+  // Monta payload para o Google Apps Script
+  const payload = {
+    assessor:      dadosFormulario.assessor,
+    dataFp:        dadosFormulario.dataFp,
+    clienteNome:   dadosFormulario.clienteNome,
+    clienteCodigo: dadosFormulario.clienteCodigo,
+    patrimonio:    dadosFormulario.patrimonio,
+    faixa:         dadosFormulario.faixa,
+    produtos:      dadosFormulario.produtos.map(p => p.nome).join(", "),
+    detalhes:      dadosFormulario.produtos.map(p => `${p.nome}: ${p.detalhe}`).join(" | "),
+    status:        dadosFormulario.status,
+    diasRetorno:   dadosFormulario.diasRetorno,
+    observacoes:   dadosFormulario.observacoes
+  };
+
+  // ⚠️ Substitua pela URL do seu Google Apps Script
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
+
+  fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    document.getElementById("loading-overlay").style.display = "none";
+    exibirSucesso();
+  })
+  .catch(() => {
+    document.getElementById("loading-overlay").style.display = "none";
+    alert("Erro ao salvar. Verifique sua conexão e tente novamente.");
+  });
+}
+
+// ============================================================
+// TELA DE SUCESSO — RESUMO
+// ============================================================
+function exibirSucesso() {
+  const produtos = dadosFormulario.produtos.map(p => `• ${p.nome}`).join("<br>");
+
+  document.getElementById("resumo-box").innerHTML = `
+    <p><strong>Assessor:</strong> ${dadosFormulario.assessor}</p>
+    <p><strong>Data:</strong> ${formatarData(dadosFormulario.dataFp)}</p>
+    <p><strong>Cliente:</strong> ${dadosFormulario.clienteNome} (${dadosFormulario.clienteCodigo})</p>
+    <p><strong>Patrimônio:</strong> ${formatarMoeda(dadosFormulario.patrimonio)}</p>
+    <p><strong>Faixa:</strong> ${dadosFormulario.faixa}</p>
+    <p><strong>Produtos:</strong><br>${produtos}</p>
+    <p><strong>Status:</strong> ${dadosFormulario.status}</p>
+    ${dadosFormulario.diasRetorno ? `<p><strong>Retorno em:</strong> ${dadosFormulario.diasRetorno} dias</p>` : ""}
+    ${dadosFormulario.observacoes ? `<p><strong>Obs:</strong>
