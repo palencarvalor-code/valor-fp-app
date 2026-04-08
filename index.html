@@ -544,25 +544,31 @@
   }
 
   async function enviarFormulario() {
-    if (!document.querySelector(".status-card.selecionado")) {
-      alert("Selecione o status do cliente.");
-      return;
-    }
-    const dados = coletarDados();
-    const overlay = document.getElementById("loading-overlay");
-    overlay.classList.add("open");
-    try {
-      const params = new URLSearchParams(dados);
-      await fetch(`${SHEET_URL}?${params}`, { method: "GET", mode: "no-cors" });
-      exibirResumo(dados);
-      irPara(5);
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao salvar. Tente novamente.");
-    } finally {
-      overlay.classList.remove("open");
-    }
+  if (!document.querySelector(".status-card.selecionado")) {
+    alert("Selecione o status do cliente.");
+    return;
   }
+
+  const dados = coletarDados();
+  const overlay = document.getElementById("loading-overlay");
+  overlay.classList.add("open");
+
+  try {
+    const formData = new FormData();
+    Object.entries(dados).forEach(([key, value]) => formData.append(key, value));
+
+    await fetch(SHEET_URL, { method: "POST", body: formData, mode: "no-cors" });
+
+    exibirResumo(dados);
+    irPara(5);
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao salvar. Tente novamente.");
+  } finally {
+    overlay.classList.remove("open");
+  }
+}
+
 
   function exibirResumo(dados) {
     const produtos = JSON.parse(dados.produtos);
