@@ -163,7 +163,17 @@
       margin-top: 2px; accent-color: #f97316; cursor: pointer;
     }
 
+    /* ── Termômetro Geral ── */
+    .termometro-titulo {
+      font-size: 15px; font-weight: 700; color: #0a2342;
+      margin-bottom: 4px;
+    }
+    .termometro-subtitulo {
+      font-size: 13px; color: #6b7280; margin-bottom: 14px;
+    }
+
     .status-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 6px; }
+
     .status-card {
       display: flex; align-items: center; gap: 12px;
       padding: 14px 16px; border: 2px solid #e5e7eb;
@@ -171,12 +181,55 @@
       transition: all 0.2s; background: #fafafa;
     }
     .status-card:hover { border-color: #2e7df7; background: #eff6ff; }
-    .status-card.selecionado {
-      border-color: #2e7df7; background: #eff6ff;
-      box-shadow: 0 0 0 3px rgba(46,125,247,0.12);
+
+    /* Quente */
+    .status-card[data-status="Cliente Quente"]:hover,
+    .status-card[data-status="Cliente Quente"].selecionado {
+      border-color: #ef4444; background: #fff1f1;
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
     }
-    .status-icon  { font-size: 20px; }
-    .status-label { font-size: 14px; font-weight: 600; color: #374151; }
+    /* Em Maturação */
+    .status-card[data-status="Em Maturação"]:hover,
+    .status-card[data-status="Em Maturação"].selecionado {
+      border-color: #f59e0b; background: #fffbeb;
+      box-shadow: 0 0 0 3px rgba(245,158,11,0.12);
+    }
+    /* Sem Momento */
+    .status-card[data-status="Sem Momento"]:hover,
+    .status-card[data-status="Sem Momento"].selecionado {
+      border-color: #6b7280; background: #f9fafb;
+      box-shadow: 0 0 0 3px rgba(107,114,128,0.12);
+    }
+
+    .status-icon  { font-size: 22px; }
+    .status-info  { display: flex; flex-direction: column; }
+    .status-label { font-size: 14px; font-weight: 700; color: #374151; }
+    .status-desc  { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+    /* Prazo maturação */
+    .prazo-maturacao {
+      display: none;
+      background: #fffbeb; border: 1.5px solid #fde68a;
+      border-radius: 12px; padding: 14px 16px; margin-top: 4px;
+    }
+    .prazo-maturacao label {
+      font-size: 13px; font-weight: 600; color: #92400e; margin-bottom: 8px; display: block;
+    }
+    .prazo-opcoes {
+      display: flex; gap: 10px;
+    }
+    .prazo-btn {
+      flex: 1; padding: 10px 0;
+      border: 2px solid #fde68a; border-radius: 10px;
+      background: white; font-size: 14px; font-weight: 700;
+      color: #92400e; cursor: pointer; transition: all 0.2s;
+      text-align: center;
+    }
+    .prazo-btn:hover { background: #fef9c3; border-color: #fbbf24; }
+    .prazo-btn.selecionado {
+      background: #f59e0b; border-color: #f59e0b;
+      color: white;
+    }
 
     .sucesso-icon { font-size: 56px; text-align: center; margin-bottom: 12px; }
 
@@ -378,40 +431,54 @@
 
   <!-- STEP 4 -->
   <section class="screen" id="step-4">
-    <h2>Status & Encaminhamento ✅</h2>
-    <p class="subtitle">Como ficou o resultado do FP?</p>
+    <h2>Termômetro Geral do Cliente 🌡️</h2>
+    <p class="subtitle">Como você classifica o momento deste cliente com a PJ2?</p>
+
     <div class="form-group">
-      <label>Status do cliente</label>
       <div class="status-options">
-        <div class="status-card" data-status="Interesse imediato" onclick="selecionarStatus(this)">
-          <div class="status-icon">🟢</div>
-          <div class="status-label">Interesse imediato</div>
+
+        <div class="status-card" data-status="Cliente Quente" onclick="selecionarStatus(this)">
+          <div class="status-icon">🔥</div>
+          <div class="status-info">
+            <div class="status-label">Cliente Quente</div>
+            <div class="status-desc">Quer avançar agora — contato imediato</div>
+          </div>
         </div>
-        <div class="status-card" data-status="Em análise" onclick="selecionarStatus(this)">
-          <div class="status-icon">🟡</div>
-          <div class="status-label">Em análise</div>
+
+        <div class="status-card" data-status="Em Maturação" onclick="selecionarStatus(this)">
+          <div class="status-icon">⏳</div>
+          <div class="status-info">
+            <div class="status-label">Em Maturação</div>
+            <div class="status-desc">Precisa de mais touchpoints — agendar retorno</div>
+          </div>
         </div>
-        <div class="status-card" data-status="Sem oportunidade" onclick="selecionarStatus(this)">
-          <div class="status-icon">🔴</div>
-          <div class="status-label">Sem oportunidade</div>
+
+        <div class="status-card" data-status="Sem Momento" onclick="selecionarStatus(this)">
+          <div class="status-icon">❄️</div>
+          <div class="status-info">
+            <div class="status-label">Sem Momento</div>
+            <div class="status-desc">Não é a hora — reagendar no futuro</div>
+          </div>
         </div>
+
       </div>
     </div>
-    <div class="form-group" id="grupo-retorno" style="display:none">
-      <label>Retornar em quantos dias?</label>
-      <select id="diasRetorno">
-        <option value="">Selecione...</option>
-        <option>7</option>
-        <option>15</option>
-        <option>30</option>
-        <option>60</option>
-        <option>90</option>
-      </select>
+
+    <!-- Prazo — aparece só para "Em Maturação" -->
+    <div class="prazo-maturacao" id="prazo-maturacao">
+      <label>⏰ Prazo para novo contato com o Assessor</label>
+      <div class="prazo-opcoes">
+        <div class="prazo-btn" data-dias="30" onclick="selecionarPrazo(this)">30 dias</div>
+        <div class="prazo-btn" data-dias="45" onclick="selecionarPrazo(this)">45 dias</div>
+        <div class="prazo-btn" data-dias="60" onclick="selecionarPrazo(this)">60 dias</div>
+      </div>
     </div>
-    <div class="form-group">
+
+    <div class="form-group" style="margin-top: 18px;">
       <label>Observações (opcional)</label>
       <textarea id="observacoes" rows="3" placeholder="Anotações importantes sobre o FP..."></textarea>
     </div>
+
     <div class="btn-row">
       <button class="btn-secondary" onclick="irPara(3)">← Voltar</button>
       <button class="btn-primary" onclick="enviarFormulario()">Enviar registro ✓</button>
@@ -509,11 +576,26 @@
   }
 
   function selecionarStatus(card) {
+    // Remove seleção anterior
     document.querySelectorAll(".status-card").forEach(c => c.classList.remove("selecionado"));
     card.classList.add("selecionado");
+
     const status = card.dataset.status;
-    document.getElementById("grupo-retorno").style.display =
-      status !== "Sem oportunidade" ? "block" : "none";
+    const prazoBox = document.getElementById("prazo-maturacao");
+
+    // Mostra prazo APENAS para "Em Maturação"
+    if (status === "Em Maturação") {
+      prazoBox.style.display = "block";
+    } else {
+      prazoBox.style.display = "none";
+      // Limpa prazo selecionado se mudar de opção
+      document.querySelectorAll(".prazo-btn").forEach(b => b.classList.remove("selecionado"));
+    }
+  }
+
+  function selecionarPrazo(btn) {
+    document.querySelectorAll(".prazo-btn").forEach(b => b.classList.remove("selecionado"));
+    btn.classList.add("selecionado");
   }
 
   function coletarDados() {
@@ -525,50 +607,67 @@
       produtos.push({ nome, status, obs });
     });
 
-    const statusCard = document.querySelector(".status-card.selecionado");
+    const statusCard  = document.querySelector(".status-card.selecionado");
+    const statusCliente = statusCard ? statusCard.dataset.status : "";
+
+    // Prazo só coletado se "Em Maturação"
+    const prazoSelecionado = document.querySelector(".prazo-btn.selecionado");
+    const diasRetorno = statusCliente === "Em Maturação" && prazoSelecionado
+      ? prazoSelecionado.dataset.dias
+      : "";
 
     return {
+      timestamp:     new Date().toISOString(),
       assessor:      document.getElementById("assessor").value,
       dataFp:        document.getElementById("dataFp").value,
       clienteNome:   document.getElementById("clienteNome").value,
       clienteCodigo: document.getElementById("clienteCodigo").value,
       patrimonio:    document.getElementById("patrimonio").value,
       faixa:         document.getElementById("faixa").value,
-      statusCliente: statusCard ? statusCard.dataset.status : "",
-      diasRetorno:   document.getElementById("diasRetorno").value,
+      status:        statusCliente,
+      diasRetorno:   diasRetorno,
       observacoes:   document.getElementById("observacoes").value,
-      semInteresse:  document.getElementById("chk-sem-interesse").checked,
+      semInteresse:  String(document.getElementById("chk-sem-interesse").checked),
       produtos:      JSON.stringify(produtos),
-      timestamp:     new Date().toISOString()
+      detalhesProdutos: produtos.map(p => `${p.nome}: ${p.status}${p.obs ? ` (${p.obs})` : ""}`).join(" | ")
     };
   }
 
   async function enviarFormulario() {
-  if (!document.querySelector(".status-card.selecionado")) {
-    alert("Selecione o status do cliente.");
-    return;
+    const statusCard = document.querySelector(".status-card.selecionado");
+    if (!statusCard) {
+      alert("Classifique o momento do cliente no Termômetro.");
+      return;
+    }
+
+    // Valida prazo se "Em Maturação"
+    if (statusCard.dataset.status === "Em Maturação" && !document.querySelector(".prazo-btn.selecionado")) {
+      alert("Selecione o prazo de retorno para cliente Em Maturação.");
+      return;
+    }
+
+    const dados  = coletarDados();
+    const overlay = document.getElementById("loading-overlay");
+    overlay.classList.add("open");
+
+    try {
+      // ✅ Envia como JSON — alinhado com doPost que usa JSON.parse(e.postData.contents)
+      await fetch(SHEET_URL, {
+        method:  "POST",
+        mode:    "no-cors",
+        headers: { "Content-Type": "text/plain" }, // text/plain passa pelo no-cors sem preflight
+        body:    JSON.stringify(dados)
+      });
+
+      exibirResumo(dados);
+      irPara(5);
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao salvar. Tente novamente.");
+    } finally {
+      overlay.classList.remove("open");
+    }
   }
-
-  const dados = coletarDados();
-  const overlay = document.getElementById("loading-overlay");
-  overlay.classList.add("open");
-
-  try {
-    const formData = new FormData();
-    Object.entries(dados).forEach(([key, value]) => formData.append(key, value));
-
-    await fetch(SHEET_URL, { method: "POST", body: formData, mode: "no-cors" });
-
-    exibirResumo(dados);
-    irPara(5);
-  } catch (err) {
-    console.error(err);
-    alert("Erro ao salvar. Tente novamente.");
-  } finally {
-    overlay.classList.remove("open");
-  }
-}
-
 
   function exibirResumo(dados) {
     const produtos = JSON.parse(dados.produtos);
@@ -578,12 +677,14 @@
         ).join("<br>")
       : "<em>Nenhum produto selecionado</em>";
 
+    const prazoTexto = dados.diasRetorno ? ` · Retorno em ${dados.diasRetorno} dias` : "";
+
     document.getElementById("resumo-box").innerHTML = `
       <strong>📅 Data:</strong> ${formatarData(dados.dataFp)}<br>
       <strong>👤 Assessor:</strong> ${dados.assessor}<br>
       <strong>🏢 Cliente:</strong> ${dados.clienteNome} ${dados.clienteCodigo ? `(${dados.clienteCodigo})` : ""}<br>
       <strong>💰 Patrimônio:</strong> ${dados.patrimonio ? `R$ ${Number(dados.patrimonio).toLocaleString("pt-BR")}` : "—"} · ${dados.faixa || "—"}<br>
-      <strong>📊 Status:</strong> ${dados.statusCliente || "—"}${dados.diasRetorno ? ` · Retorno em ${dados.diasRetorno} dias` : ""}<br>
+      <strong>🌡️ Termômetro:</strong> ${dados.status || "—"}${prazoTexto}<br>
       <strong>💼 Cross Sell:</strong><br>${listaProdutos}<br>
       ${dados.observacoes ? `<strong>📝 Obs:</strong> ${dados.observacoes}` : ""}
     `;
@@ -605,13 +706,13 @@
       if (ta) ta.value = "";
     });
     document.querySelectorAll(".status-card").forEach(c => c.classList.remove("selecionado"));
-    document.getElementById("grupo-retorno").style.display = "none";
+    document.querySelectorAll(".prazo-btn").forEach(b => b.classList.remove("selecionado"));
+    document.getElementById("prazo-maturacao").style.display = "none";
     document.getElementById("clienteNome").value   = "";
     document.getElementById("clienteCodigo").value = "";
     document.getElementById("patrimonio").value    = "";
     document.getElementById("faixa").value         = "";
     document.getElementById("observacoes").value   = "";
-    document.getElementById("diasRetorno").value   = "";
     document.getElementById("chk-sem-interesse").checked = false;
     atualizarSemInteresse();
     irPara(1);
